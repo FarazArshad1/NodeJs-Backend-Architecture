@@ -1,7 +1,10 @@
 import asyncHandler from "express-async-handler"
 import Todo from "../models/todoModel.js"
+import type { ProtectedRequest } from "../types/app-request.js"
+import type { Response, RequestHandler } from "express"
 
-const createTodo = asyncHandler(async (req, res) => {
+
+const createTodo: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const { title, description } = req.body
   console.log(req.user)
 
@@ -15,7 +18,7 @@ const createTodo = asyncHandler(async (req, res) => {
   res.status(201).json({ title, description })
 })
 
-const getTodos = asyncHandler(async (req, res) => {
+const getTodos: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const user = req.user
   const todos = await Todo.find({
     user: user,
@@ -23,7 +26,7 @@ const getTodos = asyncHandler(async (req, res) => {
   res.json(todos)
 })
 
-const editTodo = asyncHandler(async (req, res) => {
+const editTodo: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const { title, description, status } = req.body
 
   const user = req.user
@@ -35,9 +38,8 @@ const editTodo = asyncHandler(async (req, res) => {
 
   const todo = await Todo.findById(req.params.id)
 
-  console.log(todo.user.toString() !== user._id.toString())
 
-  if (todo.user.toString() !== user._id.toString()) {
+  if (todo?.user.toString() !== user?._id.toString()) {
     res.status(401)
     throw new Error("Not authorized to update this todo")
   }
@@ -56,11 +58,11 @@ const editTodo = asyncHandler(async (req, res) => {
   res.json(updatedTodo)
 })
 
-const deleteTodo = asyncHandler(async (req, res) => {
+const deleteTodo: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const todo = await Todo.findById(req.params.id)
 
   if (todo) {
-    await todo.remove()
+    await todo.deleteOne()
     res.json({ message: "Todo removed" })
   } else {
     res.status(404)

@@ -9,7 +9,7 @@ import { errorHandler } from "./middleware/errorMiddleware.js"
 
 const PORT = port ?? 8080
 
-export const app = express()
+export const app: express.Express = express()
 
 app.use(cors({ origin: corsUrl, optionsSuccessStatus: 200 }))
 

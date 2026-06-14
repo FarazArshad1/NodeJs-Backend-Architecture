@@ -5,7 +5,7 @@ import {
   registerUser,
 } from "../controllers/userController.js"
 
-const router = express.Router()
+const router: express.Router = express.Router()
 
 router.route("/login").post(loginUser)
 router.route("/register").post(registerUser)
