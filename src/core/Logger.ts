@@ -17,7 +17,7 @@ const logLevel = environment == "development" ? "debug" : "warn"
 
 const dailyRotateFile = new DailyRotateFile({
     level: logLevel,
-    filename: `${dir}/%DATE-resourceLimits.log`,
+    filename: `${dir}/resourceLimits-%DATE%.log`,
     datePattern: "YYYY-MM-DD",
     zippedArchive: true,
     handleExceptions: true,

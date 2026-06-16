@@ -4,6 +4,7 @@ import generateToken from "../utils/generateToken.js"
 import type { RequestHandler, Response } from "express"
 import type { ProtectedRequest } from "../types/app-request.js"
 import mongoose from "mongoose"
+import { BadRequestError, InternalError } from "../core/customError.js"
 
 const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const { email, password } = req.body
@@ -18,8 +19,7 @@ const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res
       email: user.email,
     })
   } else {
-    res.status(401)
-    throw new Error(" Invalid email or password")
+    throw new BadRequestError(" Invalid email or password")
   }
 })
 
@@ -44,8 +44,7 @@ const registerUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, 
       email: user.email,
     })
   } else {
-    res.status(400)
-    throw new Error("Invalid User Credentials")
+    throw new BadRequestError("Invalid User Credentials")
   }
 })
 
@@ -124,13 +123,17 @@ const registerUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, 
 // })
 
 const logoutUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
-  res.cookie("jwt", "", {
-    httpOnly: true,
-    expires: new Date(0),
-  })
-  res.status(200).json({
+  try  {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      expires: new Date(0),
+    })
+    res.status(200).json({
     message: "Logged Out Successfully",
   })
+  } catch (error) {
+    throw new InternalError("Internal Server Error")
+  }
 })
 
 export { loginUser, registerUser, logoutUser }
