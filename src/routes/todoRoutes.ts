@@ -8,6 +8,8 @@ import {
 import { protect } from "../middleware/authMiddleware.js"
 const router: express.Router = express.Router()
 
+router.use(apikey)
+
 router.route("/").post(protect, createTodo).get(protect, getTodos)
 router.route("/:id").put(protect, editTodo).delete(protect, deleteTodo)
 

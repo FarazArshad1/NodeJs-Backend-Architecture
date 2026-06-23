@@ -5,10 +5,12 @@ import type { RequestHandler, Response } from "express"
 import type { ProtectedRequest } from "../types/app-request.js"
 import mongoose from "mongoose"
 import { BadRequestError, InternalError } from "../core/customError.js"
+import { userLoginScehma } from "../schema/user.schema.js"
 
 const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const { email, password } = req.body
 
+  const data = userLoginScehma.parse({ email, password })
   const user = await User.findOne({ email })
 
   if (user && (await user?.matchPassword?.(password))) {
@@ -123,14 +125,14 @@ const registerUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, 
 // })
 
 const logoutUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
-  try  {
+  try {
     res.cookie("jwt", "", {
       httpOnly: true,
       expires: new Date(0),
     })
     res.status(200).json({
-    message: "Logged Out Successfully",
-  })
+      message: "Logged Out Successfully",
+    })
   } catch (error) {
     throw new InternalError("Internal Server Error")
   }
