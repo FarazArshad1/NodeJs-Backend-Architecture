@@ -36,8 +36,15 @@ export default createLogger({
             level: logLevel,
             format: format.combine(
                 format.errors({ stack: true }),
-                format.timestamp(),
-                format.json(),
+                format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                environment === 'development' 
+                    ? format.combine(
+                        format.colorize(),
+                        format.printf(({ level, message, timestamp }) => {
+                            return `${timestamp} ${level}: ${message}`
+                        })
+                    )
+                    : format.json()
             ),
         }),
         dailyRotateFile,

@@ -1,15 +1,29 @@
 import express from "express"
-import type { Request, Response, NextFunction } from "express"
 import cors from "cors"
 import "./database/index.js"
 import cookieParser from "cookie-parser"
 import userRoutes from "./routes/userRoutes.js"
 import { corsUrl, environment, port } from "./config.js"
 import todoRoutes from "./routes/todoRoutes.js"
-import { APIError, ErrorType } from "./core/apiError.js"
 
 import Logger from "./core/Logger.js"
-import { InternalError } from "./core/customError.js"
+
+import { errorHandler, notFound } from "./middleware/errorMiddleware.js"
+import { printError } from "./utils/printError.js"
+
+// Catch-all for Synchronous errors
+process.on("uncaughtException", (error) => {
+  Logger.error("Uncaught Exception:", error);
+  printError(error);
+  // Ideally, gracefully shut down here as the process is in an unclean state
+  // process.exit(1);
+});
+
+// Catch-all for Asynchronous (Promise) errors
+process.on("unhandledRejection", (reason) => {
+  Logger.error("Unhandled Rejection:", reason);
+  printError(reason);
+});
 
 const PORT = port ?? 8080
 
@@ -25,25 +39,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api/users", userRoutes)
 app.use("/api/todo", todoRoutes)
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof APIError) {
-    APIError.handle(err, res)
-
-    if (err.type === ErrorType.INTERNAL) {
-      Logger.error(
-        `500 - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`
-      )
-      Logger.error(err.stack)
-
-      if (environment === "development") {
-        res.status(err.statusCode).json({
-          message: err.message, stack: err.stack
-        })
-      }
-      APIError.handle(new InternalError(), res)
-    } 
-    }
-  })
+app.use(notFound)
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)

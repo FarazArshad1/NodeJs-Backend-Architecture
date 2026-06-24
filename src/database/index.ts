@@ -1,12 +1,12 @@
 import mongoose from "mongoose"
 import { db } from "../config.js"
 import Logger from "../core/Logger.js"
+import { printError } from "../utils/printError.js"
 import type { Error } from "mongoose"
 
 
 // Build the connection String
-const dbURI = `mongodb://${db.user}:${encodeURIComponent(db.password)}@${db.host
-  }:${db.port}/${db.name}`
+export const dbURI = `mongodb://${db.host}:${db.port}/${db.name}`
 
 const options = {
   autoIndex: true,
@@ -45,6 +45,7 @@ mongoose
   .catch((e: any) => {
     Logger.info("Mongoose Connection Error")
     Logger.error(e)
+    printError(e)
   })
 
 // Connection Events

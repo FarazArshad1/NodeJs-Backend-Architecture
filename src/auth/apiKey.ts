@@ -4,17 +4,21 @@ import { APIkeySchema } from "./schemas.js"
 import { Header } from "./utils.js"
 import { ForbiddenError } from "../core/customError.js"
 import findByKey from "../controllers/APIKeyController.js"
+import type { PublicRequest } from "../types/app-request.js"
 
 const router: Router = express.Router()
 
-router.use(validator(APIkeySchema, ValidatorSource.HEADER))
+export default router.use(
+    validator(APIkeySchema, ValidatorSource.HEADER),
 
-async (req: Request, res: Response, next: NextFunction) => {
-    const key = req.headers[Header.API_KEY]?.toString()
-    if (!key) throw new ForbiddenError()
-        const apiKey = await findByKey(key)
+    async (req: PublicRequest, res: Response, next: NextFunction) => {
+        const key = req.headers[Header.API_KEY]?.toString()
+        if (!key) throw new ForbiddenError()
 
-        if (!)
-}
+        const APIKey = await findByKey(key)
+        if (!APIKey) throw new ForbiddenError()
+        req.apiKey = APIKey
 
-export default router
+        return next()
+    }
+)

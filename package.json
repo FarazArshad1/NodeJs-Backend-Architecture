@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "tsc-watch --onSuccess \"node dist/server.js\"",
-    "build": "tsc"
+    "build": "tsc",
+    "create:apiKey" : "node dist/database/seedAPIKey.js"
+
   },
   "keywords": [],
   "author": "",

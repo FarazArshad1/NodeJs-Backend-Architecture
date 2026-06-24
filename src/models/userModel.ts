@@ -40,15 +40,17 @@ userSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password)
 }
 
+// Moongoose Middleware, it runs automatically before a document is saved in mongodb
+// Checks if password is modified , if it is then the incoming password will be hashed else not
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    next()
+    return next()
   }
 
   const salt = await bcrypt.genSalt(10)
   if (this.password) this.password = await bcrypt.hash(this.password, salt)
 })
 
-const User:Model<UserDoc> = mongoose.model<UserDoc>(DOCUMENT_NAME, userSchema, COLLECTION_NAME)
+const User: Model<UserDoc> = mongoose.model<UserDoc>(DOCUMENT_NAME, userSchema, COLLECTION_NAME)
 
 export default User
