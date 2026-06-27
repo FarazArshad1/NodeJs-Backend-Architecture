@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { db } from "../config.js"
+import { db, environment } from "../config.js"
 import Logger from "../core/Logger.js"
 import { printError } from "../utils/printError.js"
 import type { Error } from "mongoose"
@@ -26,28 +26,28 @@ function setRunValidators() {
 
 mongoose.set("strictQuery", true)
 
-
 // Create the database Connection
-mongoose
-  .plugin(
-    (schema: any) => {
-      schema.pre("findOneAndUpdate", setRunValidators)
-      schema.pre("updateMany", setRunValidators)
-      schema.pre("updateOne", setRunValidators)
-      schema.pre("update", setRunValidators)
-    }
-  )
+if (environment !== "test") {
+  mongoose
+    .plugin(
+      (schema: any) => {
+        schema.pre("findOneAndUpdate", setRunValidators)
+        schema.pre("updateMany", setRunValidators)
+        schema.pre("updateOne", setRunValidators)
+        schema.pre("update", setRunValidators)
+      }
+    )
 
-  .connect(dbURI, options)
-  .then(() => {
-    Logger.info("Mongoose Connection Done")
-  })
-  .catch((e: any) => {
-    Logger.info("Mongoose Connection Error")
-    Logger.error(e)
-    printError(e)
-  })
-
+    .connect(dbURI, options)
+    .then(() => {
+      Logger.info("Mongoose Connection Done")
+    })
+    .catch((e: any) => {
+      Logger.info("Mongoose Connection Error")
+      Logger.error(e)
+      printError(e)
+    })
+}
 // Connection Events
 
 // When Successfully Connected

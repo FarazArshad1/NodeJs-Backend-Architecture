@@ -4,11 +4,10 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "tsc-watch --onSuccess \"node dist/server.js\"",
+    "start": "node dist/src/server.js",
+    "dev": "tsc-watch --onSuccess \"node dist/src/server.js\"",
     "build": "tsc",
-    "create:apiKey": "node dist/database/seedAPIKey.js",
-    "seed:roles": "node dist/database/seedRoles.js"
+    "test": "NODE_ENV=test vitest --run"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +36,10 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.3",
-    "nodemon": "^3.1.7"
+    "@types/supertest": "^7.2.0",
+    "mongodb-memory-server": "^11.2.0",
+    "nodemon": "^3.1.7",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.9"
   }
 }
