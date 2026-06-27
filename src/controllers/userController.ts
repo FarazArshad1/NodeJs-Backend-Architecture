@@ -5,7 +5,7 @@ import type { RequestHandler, Response } from "express"
 import type { ProtectedRequest } from "../types/app-request.js"
 import mongoose from "mongoose"
 import { BadRequestError, InternalError } from "../core/customError.js"
-import { userLoginScehma } from "../schema/user.schema.js"
+import { userLoginScehma, userRegisterSchema } from "../schema/user.schema.js"
 import crypto from "crypto"
 import { createTokens } from "../auth/utils.js"
 import { create } from "./keyStoreController.js"
@@ -52,7 +52,7 @@ const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res
 })
 
 const registerUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
-  const { name, email, password } = req.body
+  const { name, email, password } = userRegisterSchema.parse(req.body)
 
   const userExists = await User.findOne({ email })
 

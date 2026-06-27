@@ -3,8 +3,21 @@ import { APIError, ErrorType } from "../core/apiError.js"
 import Logger from "../core/Logger.js"
 import { environment } from "../config.js"
 import { printError } from "../utils/printError.js"
+import { ZodError } from "zod"
 
 const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof ZodError) {
+    const message = err.issues.map(e => e.message).join(", ")
+    const logMessage = `400 - ${message} - ${req.originalUrl} - ${req.method} - ${req.ip}`
+    Logger.warn(logMessage, err)
+    if (environment === 'development') printError(err)
+
+    return res.status(400).json({
+      type: ErrorType.BAD_REQUEST,
+      message: message
+    })
+  }
+
   if (err instanceof APIError) {
     APIError.handle(err, res)
     const logMessage = `${err.statusCode} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`

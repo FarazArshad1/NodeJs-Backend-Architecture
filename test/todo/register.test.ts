@@ -4,6 +4,7 @@ import { MongoMemoryServer } from "mongodb-memory-server"
 
 import { app } from "../../src/server.js";
 import mongoose from "mongoose";
+import { RoleModel } from "../../src/models/roleModel.js";
 
 let mongo: any;
 
@@ -11,6 +12,10 @@ beforeAll(async () => {
     mongo = await MongoMemoryServer.create()
     const mongoURI = mongo.getUri()
     await mongoose.connect(mongoURI)
+    await RoleModel.create({
+        code: "USER",
+        status: true
+    })
 })
 
 afterAll(async () => {
@@ -38,8 +43,20 @@ describe("Test the Register functionality", () => {
         expect(res.status).toBe(201)
         expect(res.body).toMatchObject({
             name: "John",
-            email: "john1@example.com"
+            email: "john@example.com"
         })
         expect(res.body._id).toBeDefined()
+    })
+
+    it("returns 400 with invalid email", async () => {
+        const res = await resquest(app).post(endpoint).send({
+            name: "John",
+            email: "johnexample.com",
+            password: "123456789"
+        })
+
+        // Assert
+        expect(res.status).toBe(400)
+        expect(res.body._id).not.toBeDefined()
     })
 })
