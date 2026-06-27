@@ -1,6 +1,4 @@
 import express, { Router, type Response, type NextFunction } from "express"
-import validateRequest, { ValidatorSource } from "../helper/validator.js"
-import { authSchema } from "./schemas.js"
 import { getAccessToken, validateTokeData } from "./utils.js"
 import type { ProtectedRequest } from "../types/app-request.js"
 import { tokenInfo } from "../config.js"
@@ -11,15 +9,12 @@ import { BadRequestError, TokenExpiredError } from "../core/customError.js"
 import { KeyStoreModel } from "../models/keyStoreModel.js"
 import asyncHandler from "../helper/asyncHandler.js"
 
-
 const router: Router = express.Router()
 
 export default router.use(
-    validateRequest(authSchema, ValidatorSource.HEADER),
-
     asyncHandler(
         async (req: ProtectedRequest, res: Response, next: NextFunction) => {
-            const accessToken = getAccessToken(req.headers.authorization)
+            const accessToken = req.cookies.accessToken
             req.accessToken = accessToken
 
             try {
