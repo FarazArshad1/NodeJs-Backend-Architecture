@@ -1,5 +1,6 @@
-import { sign, type SignOptions, decode as jwtdecode, type JwtPayload, verify } from "jsonwebtoken"
-import { BadRequestError, BadTokenError, InternalError, TokenExpiredError } from "./customError.js"
+import pkg, { type SignOptions, type JwtPayload } from "jsonwebtoken"
+const { sign, decode: jwtdecode, verify } = pkg;
+import { BadTokenError, InternalError, TokenExpiredError } from "./customError.js"
 
 export class JWTPayload {
 

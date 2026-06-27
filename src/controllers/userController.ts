@@ -6,6 +6,10 @@ import type { ProtectedRequest } from "../types/app-request.js"
 import mongoose from "mongoose"
 import { BadRequestError, InternalError } from "../core/customError.js"
 import { userLoginScehma } from "../schema/user.schema.js"
+import crypto from "crypto"
+import { createTokens } from "../auth/utils.js"
+import { create } from "./keyStoreController.js"
+import { environment } from "../config.js"
 
 const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const { email, password } = req.body
@@ -14,11 +18,31 @@ const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res
   const user = await User.findOne({ email })
 
   if (user && (await user?.matchPassword?.(password))) {
-    generateToken(res, user._id as mongoose.Types.ObjectId)
+    const accessTokenKey = crypto.randomBytes(64).toString("hex")
+    const refreshTokenKey = crypto.randomBytes(64).toString("hex")
+
+    await create(user, accessTokenKey, refreshTokenKey)
+    const tokens = await createTokens(user, accessTokenKey, refreshTokenKey)
+
+    res.cookie("accessToken", tokens.accessToken, {
+      httpOnly: true,
+      secure: environment === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000
+    })
+
+    res.cookie("refreshToken", tokens.accessToken, {
+      httpOnly: true,
+      secure: environment === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000
+    })
+
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      tokens: tokens
     })
   } else {
     throw new BadRequestError(" Invalid email or password")

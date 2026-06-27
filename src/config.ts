@@ -20,10 +20,10 @@ export const db = {
 export const tokenInfo = {
   accessTokenValidity: parseInt(process.env.ACCESS_TOKEN_VALIDITY_SEC ?? "3600"),
   refreshTokenValidity: parseInt(process.env.REFRESH_TOKEN_VALIDITY_SEC ?? "86400"),
-  audience: process.env.TOKEN_AUDIENCE,
-  issuer: process.env.TOKEN_ISSUER,
-  secret: process.env.TOKEN_SECRET,
-  algorithm: process.env.TOKEN_ALGORITHM,
+  audience: process.env.TOKEN_AUDIENCE ?? "",
+  issuer: process.env.TOKEN_ISSUER ?? "",
+  secret: process.env.TOKEN_SECRET ?? "",
+  algorithm: process.env.TOKEN_ALGORITHM ?? "",
 
 }
 
