@@ -10,6 +10,8 @@ import crypto from "crypto"
 import { createTokens } from "../auth/utils.js"
 import { create } from "./keyStoreController.js"
 import { environment } from "../config.js"
+import getRole from "./roleController.js"
+import { RoleCode } from "../models/roleModel.js"
 
 const loginUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, res: Response) => {
   const { email, password } = req.body
@@ -59,7 +61,14 @@ const registerUser: RequestHandler = asyncHandler(async (req: ProtectedRequest, 
     throw new Error("User already Exists")
   }
 
-  const user = await User.create({ name, email, password })
+  const user = await User.create(
+    {
+      name,
+      email,
+      password,
+      roles: [await getRole(RoleCode.USER)]
+    }
+  )
 
   if (user) {
     generateToken(res, user._id as mongoose.Types.ObjectId)

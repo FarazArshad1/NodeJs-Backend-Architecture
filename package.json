@@ -7,7 +7,8 @@
     "start": "node dist/server.js",
     "dev": "tsc-watch --onSuccess \"node dist/server.js\"",
     "build": "tsc",
-    "create:apiKey": "node dist/database/seedAPIKey.js"
+    "create:apiKey": "node dist/database/seedAPIKey.js",
+    "seed:roles": "node dist/database/seedRoles.js"
   },
   "keywords": [],
   "author": "",
